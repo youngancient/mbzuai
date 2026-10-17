@@ -57,13 +57,7 @@ button:focus-visible,.opt:focus-visible{outline:2px solid var(--accent);outline-
 .note{font-size:.88rem;color:var(--muted)}
 /* touch-only devices have no keyboard, so hide the shortcut hint */
 @media (hover:none) and (pointer:coarse){.keys{display:none}}
-.sync{gap:0}.sync[open]{gap:18px}
-.sync summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.sync summary::-webkit-details-marker{display:none}
-.sync summary::after{content:"+";font-size:1.4rem;line-height:1;color:var(--muted)}
-.sync[open] summary::after{content:"−"}
-.sync summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:4px}
-.code{font:inherit;font-family:var(--f-mono);font-size:.8rem;width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--code);color:var(--ink);resize:vertical;word-break:break-all}
+.syncline{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 10px;text-align:center}
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .stat{display:flex;flex-direction:column;gap:2px}
 .stat b{font-family:var(--f-display);font-size:1.5rem;font-variant-numeric:tabular-nums}
@@ -77,7 +71,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .timer.low{color:var(--bad)}
 .qhead{display:flex;gap:10px;flex-wrap:wrap;align-items:baseline}
 .qnum{font-family:var(--f-mono);font-size:.85rem;color:var(--muted)}
-.tag{font-size:.76rem;border:1px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--muted)}
+.tag{font-size:.85rem;color:var(--muted)}
+.qhead .qnum:last-child{margin-left:auto}
 .qtext{font-size:1.12rem;font-weight:500;line-height:1.5}
 pre{margin:0;background:var(--code);border-radius:8px;padding:12px 14px;font-family:var(--f-mono);font-size:.88rem;line-height:1.5;overflow-x:auto;white-space:pre}
 .opts{display:flex;flex-direction:column;gap:8px}
@@ -93,11 +88,11 @@ pre{margin:0;background:var(--code);border-radius:8px;padding:12px 14px;font-fam
 .opt.right .bub{background:var(--good);border-color:var(--good);color:var(--surface)}
 .opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
 .opt.wrong .bub{background:var(--bad);border-color:var(--bad);color:var(--surface)}
-.feedback{border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;border:1px solid var(--line)}
-.feedback.ok{background:var(--good-soft);border-color:var(--good)}
-.feedback.no{background:var(--bad-soft);border-color:var(--bad)}
+.feedback{display:flex;flex-direction:column;gap:6px;padding-top:4px}
+.feedback.ok strong{color:var(--good)}
+.feedback.no strong{color:var(--bad)}
 .feedback strong{font-family:var(--f-display)}
-.fix{background:var(--warn-soft);border-left:3px solid var(--warn);padding:8px 12px;border-radius:4px;font-size:.9rem}
+.fix{border-left:2px solid var(--warn);padding-left:10px;font-size:.88rem;color:var(--muted)}
 .fix b{color:var(--warn)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:6px}
 .grid button{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:6px 0;font-family:var(--f-mono);font-size:.8rem;font-variant-numeric:tabular-nums}
@@ -109,13 +104,13 @@ pre{margin:0;background:var(--code);border-radius:8px;padding:12px 14px;font-fam
 .trow{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:4px 12px;align-items:center;font-size:.92rem}
 .tbar{grid-column:1/-1;height:6px;background:var(--line);border-radius:4px;overflow:hidden}
 .tbar i{display:block;height:100%}
-.tnum{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:.85rem}
+.tnum{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:.85rem;white-space:nowrap}
 .review{display:flex;flex-direction:column;gap:14px}
 .ritem{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:8px}
 .ans{font-size:.92rem;display:flex;flex-direction:column;gap:2px}
 .ans .y{color:var(--bad)} .ans .c{color:var(--good)}
 kbd{font-family:var(--f-mono);font-size:.78rem;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px}
-@media (max-width:480px){.stats{grid-template-columns:1fr 1fr}.panel{padding:16px}}
+@media (max-width:480px){.panel{padding:16px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 body{margin:0}*,*::before,*::after{box-sizing:border-box}[hidden]{display:none!important}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -124,6 +119,9 @@ body{margin:0}*,*::before,*::after{box-sizing:border-box}[hidden]{display:none!i
 <body>
 <div class="wrap" id="app"></div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
 const TOPICS={P:"Probability & Statistics",L:"Linear Algebra",E:"Equations & Series",C:"Calculus",Y:"Python",A:"Algorithms & Complexity",D:"Data Structures",G:"Area & Geometry",O:"Optimization",S:"CS Fundamentals"};
 const Q=[];
@@ -290,7 +288,7 @@ q("O","Which is NOT a method for unconstrained optimization?",["Newton's method"
 q("Y","What does this code do in Python 3 (no imports)?",["Prints 15","Prints 120","Prints 0","Raises NameError"],3,"In Python 3, reduce lives in functools. With `from functools import reduce` it would print 120 (1·2·3·4·5).",{c:"print(reduce(lambda x, y: x*y, range(1, 6)))",f:"The book's key says 120, but without the import this line raises NameError."});
 
 /* ---------- state & storage ---------- */
-const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}if(SYNC_KEYS.includes(k))sync.changed()}};
 let cfg=Object.assign({mode:"practice",topics:Object.keys(TOPICS),len:20,timer:0,missedOnly:false},store.get("mbz-cfg",{}));
 let S=null; let tick=null;
 const $=s=>document.querySelector(s);
@@ -308,7 +306,6 @@ function renderSetup(){
   if(!missed.length) cfg.missedOnly=false;
   const p=pool(); const n=cfg.len==="all"?p.length:Math.min(cfg.len,p.length);
   const seg=(key,vals,labels)=>el("div",{class:"seg",role:"group"},vals.map((v,i)=>el("button",{"aria-pressed":String(cfg[key]===v),onclick:()=>{cfg[key]=v;save();renderSetup()}},labels[i])));
-  const counts={};Q.forEach(x=>counts[x.t]=(counts[x.t]||0)+1);
   const fixedN=Q.filter(x=>x.f&&x.f!==DUP).length;
   const best=hist.length?Math.max(...hist.map(h=>Math.round(100*h.s/h.n))):null;
   const tstats=store.get("mbz-topics",{});
@@ -319,77 +316,100 @@ function renderSetup(){
   const weakPanel=el("section",{class:"panel"},
     el("div",{class:"row between"},el("h2",{text:"Your weak areas"}),
       tried.length?el("button",{class:"linkbtn",onclick:()=>{store.set("mbz-topics",{});renderSetup()}},"Reset stats"):null),
-    tried.length?el("p",{class:"note",text:"Accuracy per topic across every quiz you've taken, weakest first."}):
-      el("p",{class:"note",text:"Take a quiz and your accuracy in each topic will build up here, weakest first, so you know what to drill."}),
     ...tried.map(t=>{const v=tstats[t],p=v.r/v.n;return el("div",{class:"trow"},
       el("span",{text:TOPICS[t]}),el("span",{class:"tnum",text:`${Math.round(p*100)}% · ${v.n}`}),
       el("div",{class:"tbar"},el("i",{style:`width:${Math.max(p*100,2)}%;background:var(${p>=.875?"--good":p>=.6?"--warn":"--bad"})`})))}),
     tried.length&&untried.length?el("p",{class:"note",text:"Not tried yet: "+untried.map(t=>TOPICS[t]).join(", ")+"."}):null,
     weakest?el("div",{class:"row"},el("button",{class:"btn primary",onclick:()=>drill(weakest)},`Drill ${TOPICS[weakest]}`),
       el("span",{class:"note",text:`All ${Q.filter(x=>x.t===weakest).length} questions, practice mode`})):null);
-  app.replaceChildren(
+  app.replaceChildren(...[
     el("header",{class:"field"},
       el("span",{class:"eyebrow",text:"Master's admission test practice"}),
       el("h1",{text:"MBZUAI Prep Quiz"}),
-      el("p",{class:"muted",text:`${Q.length} questions from your prep book, with the answers hidden and the key checked. ${fixedN} wrong answers in the book have been corrected, and duplicate options replaced. Options are shuffled each time, so you learn the answer, not the letter.`})
+      el("p",{class:"muted",text:`${Q.length} questions from your prep book · ${fixedN} answers corrected · options shuffled`})
     ),
-    el("section",{class:"panel"},
+    hist.length?el("section",{class:"panel"},
       el("div",{class:"stats"},
         el("div",{class:"stat"},el("b",{text:String(hist.length)}),el("span",{text:"quizzes taken"})),
         el("div",{class:"stat"},el("b",{text:best==null?"—":best+"%"}),el("span",{text:"best score"})),
-        el("div",{class:"stat"},el("b",{text:String(missed.length)}),el("span",{text:"in your missed pile"}))
+        el("div",{class:"stat"},el("b",{text:String(missed.length)}),el("span",{text:"to revisit"}))
       )
-    ),
-    weakPanel,
+    ):null,
+    tried.length?weakPanel:null,
     el("section",{class:"panel"},
       el("div",{class:"field"},el("span",{class:"eyebrow",text:"Mode"}),
-        seg("mode",["practice","exam"],["Practice · feedback each question","Mock exam · results at the end"])),
+        seg("mode",["practice","exam"],["Practice","Mock exam"])),
       el("div",{class:"field"},
         el("div",{class:"row between"},el("span",{class:"eyebrow",text:"Topics"}),
           el("div",{class:"row"},el("button",{class:"linkbtn",onclick:()=>{cfg.topics=Object.keys(TOPICS);save();renderSetup()}},"All"),el("span",{class:"muted",text:"·"}),el("button",{class:"linkbtn",onclick:()=>{cfg.topics=[];save();renderSetup()}},"None"))),
-        el("div",{class:"row"},Object.keys(TOPICS).map(k=>el("button",{class:"chip","aria-pressed":String(cfg.topics.includes(k)),onclick:()=>{cfg.topics=cfg.topics.includes(k)?cfg.topics.filter(t=>t!==k):[...cfg.topics,k];save();renderSetup()}},TOPICS[k],el("span",{class:"n",text:String(counts[k])}))))
+        el("div",{class:"row"},Object.keys(TOPICS).map(k=>el("button",{class:"chip","aria-pressed":String(cfg.topics.includes(k)),onclick:()=>{cfg.topics=cfg.topics.includes(k)?cfg.topics.filter(t=>t!==k):[...cfg.topics,k];save();renderSetup()}},TOPICS[k])))
       ),
       el("div",{class:"field"},el("span",{class:"eyebrow",text:"Length"}),
-        seg("len",[10,20,40,"all"],["10","20","40 (test length)","All "+p.length])),
+        seg("len",[10,20,40,"all"],["10","20","40","All"])),
       cfg.mode==="exam"?el("div",{class:"field"},el("span",{class:"eyebrow",text:"Time limit"}),
         seg("timer",[0,30,45,60,90],["None","30 min","45 min","60 min","90 min"]),
         el("p",{class:"note",text:"Set it to match the time your test invitation gives you."})):null,
-      el("label",{class:"check"},
-        Object.assign(el("input",{type:"checkbox",id:"missedOnly"}),{checked:cfg.missedOnly,disabled:!missed.length,onchange:e=>{cfg.missedOnly=e.target.checked;save();renderSetup()}}),
-        missed.length?`Only questions I've missed before (${missed.length})`:"Only questions I've missed before (none yet)"),
+      missed.length?el("label",{class:"check"},
+        Object.assign(el("input",{type:"checkbox",id:"missedOnly"}),{checked:cfg.missedOnly,onchange:e=>{cfg.missedOnly=e.target.checked;save();renderSetup()}}),
+        `Only questions I've missed before (${missed.length})`):null,
       el("div",{class:"row between"},
         el("p",{class:"note keys"},"Shortcuts: press ",el("kbd",{text:"A"}),"–",el("kbd",{text:"D"})," or ",el("kbd",{text:"1"}),"–",el("kbd",{text:"4"})," to pick an option, ",el("kbd",{text:"Enter"})," for next."),
         Object.assign(el("button",{class:"btn primary",onclick:()=>start(),id:"startBtn"},n?`Start ${n} question${n>1?"s":""}`:"Pick at least one topic"),{disabled:!n}))
     ),
     syncPanel()
-  );
+  ].filter(Boolean));
 }
 function save(){store.set("mbz-cfg",cfg)}
 
-/* ---------- export / import (progress lives per browser, so this moves it between devices) ---------- */
-const SYNC_KEYS=["mbz-cfg","mbz-missed","mbz-hist","mbz-topics"], SYNC_PREFIX="MBZ1:";
-function exportCode(){const d={};SYNC_KEYS.forEach(k=>d[k]=store.get(k,null));return SYNC_PREFIX+btoa(JSON.stringify(d))}
-function importCode(code){
-  code=code.trim(); if(!code.startsWith(SYNC_PREFIX))throw new Error("That doesn't look like a progress code from this site.");
-  let d; try{d=JSON.parse(atob(code.slice(SYNC_PREFIX.length)))}catch(e){throw new Error("The code is incomplete or damaged. Copy it again in full.")}
-  if(!d||typeof d!=="object"||!SYNC_KEYS.some(k=>d[k]!=null))throw new Error("The code has no progress in it.");
-  SYNC_KEYS.forEach(k=>store.set(k,d[k]==null?(k==="mbz-cfg"?{}:k==="mbz-topics"?{}:[]):d[k]));
-  cfg=Object.assign({mode:"practice",topics:Object.keys(TOPICS),len:20,timer:0,missedOnly:false},store.get("mbz-cfg",{}));
-}
+/* ---------- cloud sync (Firebase: Google sign-in, one Firestore doc per user at users/{uid}) ---------- */
+const SYNC_KEYS=["mbz-cfg","mbz-missed","mbz-hist","mbz-topics"];
+const FB_CONFIG={apiKey:"AIzaSyC9ADrVr3eZ7ni-Z12lsQ6FbqUV1jijc-Y",authDomain:"tess-896e7.firebaseapp.com",projectId:"tess-896e7",storageBucket:"tess-896e7.firebasestorage.app",messagingSenderId:"327614441328",appId:"1:327614441328:web:c194e0e9158b70a05c11b5"};
+const sync={user:null,state:"off",msg:"",timer:null,ui:null,
+  ok:typeof firebase!=="undefined",
+  local(){const d={};SYNC_KEYS.forEach(k=>{const v=store.get(k,null);if(v!=null)d[k.slice(4)]=v});return d},
+  // write without marking dirty or re-triggering a push
+  apply(d){SYNC_KEYS.forEach(k=>{const v=d[k.slice(4)];if(v!=null)try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}});
+    cfg=Object.assign({mode:"practice",topics:Object.keys(TOPICS),len:20,timer:0,missedOnly:false},store.get("mbz-cfg",{}));
+    if(!S&&$("#startBtn"))renderSetup();},
+  // first sign-in on a device: combine both sides instead of letting one wipe the other
+  merge(a,b){const m=new Set([...(a.missed||[]),...(b.missed||[])]);
+    const h=new Map();[...(a.hist||[]),...(b.hist||[])].forEach(x=>h.set(x.d+":"+x.s+"/"+x.n,x));
+    const t=Object.assign({},a.topics);for(const k in b.topics||{})if(!t[k]||b.topics[k].n>t[k].n)t[k]=b.topics[k];
+    return {cfg:b.cfg||a.cfg||{},missed:[...m],hist:[...h.values()].sort((x,y)=>x.d-y.d).slice(-50),topics:t}},
+  doc(){return firebase.firestore().collection("users").doc(this.user.uid)},
+  set(state,msg){this.state=state;this.msg=msg||"";if(this.ui)this.ui()},
+  changed(){store.set("mbz-dirty",true);if(!this.user)return;clearTimeout(this.timer);this.timer=setTimeout(()=>this.push(),800)},
+  async push(){if(!this.user)return;this.set("busy","Saving…");
+    try{await this.doc().set(Object.assign(this.local(),{updated:Date.now()}));localStorage.removeItem("mbz-dirty");this.set("on","Synced "+new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}))}
+    catch(e){this.set("err","Couldn't save to the cloud. It's kept on this device and will retry next time.")}},
+  async pull(){this.set("busy","Syncing…");
+    try{const snap=await this.doc().get(),remote=snap.exists?snap.data():null,local=this.local();
+      const first=store.get("mbz-synced-uid",null)!==this.user.uid;
+      if(!remote)await this.push();
+      else if(first){this.apply(this.merge(remote,local));store.set("mbz-synced-uid",this.user.uid);await this.push();return}
+      else if(store.get("mbz-dirty",false))await this.push();   // offline changes on this device win
+      else{this.apply(remote);this.set("on","Synced "+new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}))}
+      store.set("mbz-synced-uid",this.user.uid);}
+    catch(e){this.set("err","Couldn't reach the cloud. Progress is still saved on this device.")}},
+  async signIn(){const auth=firebase.auth(),prov=new firebase.auth.GoogleAuthProvider();
+    try{await auth.signInWithPopup(prov)}catch(e){
+      if(e.code==="auth/popup-blocked"||e.code==="auth/operation-not-supported-in-this-environment")return auth.signInWithRedirect(prov);
+      if(e.code!=="auth/popup-closed-by-user"&&e.code!=="auth/cancelled-popup-request")this.set("err","Sign-in failed: "+(e.message||e.code))}},
+  signOut(){firebase.auth().signOut()},
+  init(){if(!this.ok)return;firebase.initializeApp(FB_CONFIG);
+    firebase.auth().onAuthStateChanged(u=>{this.user=u;if(u)this.pull();else this.set("off")})}
+};
+sync.init();
 function syncPanel(){
-  const box=el("textarea",{class:"code",rows:"3",spellcheck:"false","aria-label":"Progress code",placeholder:"Paste a progress code here to import it"});
-  const msg=el("p",{class:"note","aria-live":"polite"});
-  const say=(t,bad)=>{msg.textContent=t;msg.style.color=bad?"var(--bad)":""};
-  return el("details",{class:"panel sync"},
-    el("summary",{},el("h2",{text:"Move progress to another device"})),
-    el("p",{class:"note",text:"Progress is saved only in this browser. Export a code here, then import it in your other browser or on your phone. Importing replaces the progress on that device."}),
-    box,
-    el("div",{class:"row"},
-      el("button",{class:"btn",onclick:async()=>{box.value=exportCode();box.select();
-        try{await navigator.clipboard.writeText(box.value);say("Code copied. Paste it into Import on your other device.")}catch(e){say("Code ready. Copy it from the box above.")}}},"Export"),
-      el("button",{class:"btn",onclick:()=>{if(!box.value.trim())return say("Paste a code into the box first.",true);
-        try{importCode(box.value);renderSetup();window.scrollTo(0,0)}catch(e){say(e.message,true)}}},"Import")),
-    msg);
+  if(!sync.ok)return null;
+  const line=el("footer",{class:"syncline note","aria-live":"polite"});
+  sync.ui=()=>{const u=sync.user,err=sync.state==="err";line.replaceChildren(
+    u?el("span",{text:err?sync.msg:`Synced as ${u.email||u.displayName}`,style:err?"color:var(--bad)":""}):
+      el("span",{text:err?sync.msg:"Progress is saved in this browser.",style:err?"color:var(--bad)":""}),
+    u?el("button",{class:"linkbtn",onclick:()=>sync.signOut()},"Sign out"):
+      el("button",{class:"linkbtn",onclick:()=>sync.signIn()},"Sign in to sync devices"))};
+  sync.ui();
+  return line;
 }
 function saveSession(){store.set("mbz-session",S&&{mode:S.mode,i:S.i,end:S.end,items:S.items.map(t=>({id:t.q.id,ord:t.ord,pick:t.pick}))})}
 function resume(){
@@ -430,13 +450,13 @@ function renderQ(){
   const kids=[
     el("div",{class:"bar"},
       el("div",{class:"row between"},
-        el("span",{class:"eyebrow",text:exam?"Mock exam":"Practice"}),
+        el("span",{class:"qnum",text:`${S.i+1} / ${n}`}),
         el("div",{class:"row"},S.end?el("span",{class:"timer",id:"timer",text:fmt(S.end-Date.now())}):null,
-          el("button",{class:"linkbtn",onclick:()=>exam?(S.confirm=true,renderQ()):finish()},exam?"Submit":"End & see results"))),
+          el("button",{class:"linkbtn",onclick:()=>exam?(S.confirm=true,renderQ()):finish()},exam?"Submit":"End"))),
       el("div",{class:"progress"},el("i",{style:`width:${100*done/n}%`}))
     ),
     el("section",{class:"panel"},
-      el("div",{class:"qhead"},el("span",{class:"qnum",text:`Question ${S.i+1} of ${n}`}),el("span",{class:"tag",text:TOPICS[x.t]}),el("span",{class:"qnum",text:`Book #${x.id}`})),
+      el("div",{class:"qhead"},el("span",{class:"tag",text:TOPICS[x.t]}),el("span",{class:"qnum",text:`#${x.id}`})),
       el("p",{class:"qtext",text:x.text}),
       x.c?el("pre",{},x.c):null,
       opts,
@@ -452,18 +472,18 @@ function renderQ(){
     el("button",{class:"btn",onclick:()=>go(-1)},"← Previous"),
     S.i<n-1?Object.assign(el("button",{class:"btn primary",onclick:()=>go(1)},exam?"Next →":(answered?"Next →":"Skip →")),{}):
       el("button",{class:"btn primary",onclick:()=>exam?(S.confirm=true,renderQ()):finish()},exam?"Submit":"See results"));
-  nav.firstChild.disabled=S.i===0;
+  if(S.i===0)nav.firstChild.style.visibility="hidden";
   kids.push(nav);
-  if(exam) kids.push(el("section",{class:"panel"},el("span",{class:"eyebrow",text:`Answer sheet · ${done} of ${n} marked`}),
+  if(exam) kids.push(el("section",{class:"panel"},el("span",{class:"qnum",text:`${done} of ${n} answered`}),
     el("div",{class:"grid"},S.items.map((t,k)=>el("button",{class:(t.pick!=null?"done":"")+(k===S.i?" cur":""),"aria-label":`Go to question ${k+1}`,onclick:()=>{S.i=k;saveSession();renderQ()}},String(k+1))))));
   app.replaceChildren(...kids);
 }
 function feedback(it){
   const x=it.q, ok=it.pick===x.a;
   return el("div",{class:"feedback "+(ok?"ok":"no")},
-    el("strong",{text:ok?"Correct.":`Not quite. The answer is ${LET[it.ord.indexOf(x.a)]}: ${x.o[x.a]}`}),
+    el("strong",{text:ok?"Correct":`Incorrect · answer ${LET[it.ord.indexOf(x.a)]}`}),
     el("p",{text:x.e}),
-    (x.f&&x.f!==DUP)?el("p",{class:"fix"},el("b",{text:"Fixed from the book. "}),x.f):null);
+    (x.f&&x.f!==DUP)?el("p",{class:"fix"},el("b",{text:"Corrected from the book. "}),x.f):null);
 }
 function choose(oi){const it=S.items[S.i];if(S.mode==="practice"&&it.pick!=null)return;it.pick=(S.mode==="exam"&&it.pick===oi)?null:oi;saveSession();renderQ();}
 function go(d){S.i=Math.max(0,Math.min(S.items.length-1,S.i+d));S.confirm=false;saveSession();renderQ();window.scrollTo({top:0});}
@@ -486,29 +506,29 @@ function finish(){
   let showAll=false;
   const review=el("div",{class:"review"});
   const fill=()=>{review.replaceChildren(...(showAll?items:wrong).map(i=>{const x=i.q,ok=i.pick===x.a;return el("div",{class:"ritem"},
-    el("div",{class:"qhead"},el("span",{class:"qnum",text:`Book #${x.id}`}),el("span",{class:"tag",text:TOPICS[x.t]})),
+    el("div",{class:"qhead"},el("span",{class:"tag",text:TOPICS[x.t]}),el("span",{class:"qnum",text:`#${x.id}`})),
     el("p",{style:"font-weight:500",text:x.text}),x.c?el("pre",{},x.c):null,
     el("div",{class:"ans"},
-      ok?null:el("span",{class:"y",text:"Your answer: "+(i.pick==null?"no answer":x.o[i.pick])}),
-      el("span",{class:"c",text:"Correct: "+x.o[x.a]})),
+      ok?null:el("span",{class:"y",text:"✕ "+(i.pick==null?"no answer":x.o[i.pick])}),
+      el("span",{class:"c",text:"✓ "+x.o[x.a]})),
     el("p",{class:"note",text:x.e}),
-    (x.f&&x.f!==DUP)?el("p",{class:"fix"},el("b",{text:"Fixed from the book. "}),x.f):null)}));
+    (x.f&&x.f!==DUP)?el("p",{class:"fix"},el("b",{text:"Corrected from the book. "}),x.f):null)}));
     if(!review.children.length)review.append(el("p",{class:"muted",text:"Nothing missed. Clean sheet."}));};
   fill();
   app.replaceChildren(
     el("header",{class:"field"},el("span",{class:"eyebrow",text:S.mode==="exam"?"Mock exam results":"Practice results"}),
       el("div",{class:"score",text:`${right} / ${n}`}),
-      el("p",{class:"muted",text:`${skipped?`${skipped} skipped and not scored. `:""}${pct}% correct. On a 40-question test that's about ${out40}/40${out40>=35?", above the 35 target.":`; the target is 35.`}`})),
+      el("p",{class:"muted",text:[`${pct}%`,`≈ ${out40}/40 (target 35)`,skipped?`${skipped} skipped`:""].filter(Boolean).join(" · ")})),
     el("section",{class:"panel"},el("h2",{text:"By topic"}),
       ...Object.keys(byT).sort((a,b)=>byT[a].r/byT[a].n-byT[b].r/byT[b].n).map(t=>{const v=byT[t],p=v.r/v.n;return el("div",{class:"trow"},
         el("span",{text:TOPICS[t]}),el("span",{class:"tnum",text:`${v.r}/${v.n}`}),
         el("div",{class:"tbar"},el("i",{style:`width:${Math.max(p*100,2)}%;background:var(${p>=.875?"--good":p>=.6?"--warn":"--bad"})`})))})),
     el("div",{class:"row"},
-      Object.assign(el("button",{class:"btn primary",onclick:()=>start(wrong.map(i=>i.q.id))},`Retry the ${wrong.length} I missed`),{disabled:!wrong.length}),
+      Object.assign(el("button",{class:"btn primary",onclick:()=>start(wrong.map(i=>i.q.id))},`Retry ${wrong.length} missed`),{disabled:!wrong.length}),
       el("button",{class:"btn",onclick:renderSetup},"New quiz")),
     el("section",{class:"panel"},
       el("div",{class:"row between"},el("h2",{text:"Review"}),
-        el("button",{class:"linkbtn",onclick:e=>{showAll=!showAll;e.target.textContent=showAll?"Show missed only":"Show all questions";fill()}},"Show all questions")),
+        el("button",{class:"linkbtn",onclick:e=>{showAll=!showAll;e.target.textContent=showAll?"Missed only":"Show all";fill()}},"Show all")),
       review)
   );
   S=null; window.scrollTo(0,0);
