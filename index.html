@@ -55,6 +55,8 @@ button:focus-visible,.opt:focus-visible{outline:2px solid var(--accent);outline-
 .check{display:flex;gap:10px;align-items:center;font-size:.95rem}
 .check input{width:18px;height:18px;accent-color:var(--accent)}
 .note{font-size:.88rem;color:var(--muted)}
+/* touch-only devices have no keyboard, so hide the shortcut hint */
+@media (hover:none) and (pointer:coarse){.keys{display:none}}
 .sync{gap:0}.sync[open]{gap:18px}
 .sync summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
 .sync summary::-webkit-details-marker{display:none}
@@ -356,7 +358,7 @@ function renderSetup(){
         Object.assign(el("input",{type:"checkbox",id:"missedOnly"}),{checked:cfg.missedOnly,disabled:!missed.length,onchange:e=>{cfg.missedOnly=e.target.checked;save();renderSetup()}}),
         missed.length?`Only questions I've missed before (${missed.length})`:"Only questions I've missed before (none yet)"),
       el("div",{class:"row between"},
-        el("p",{class:"note"},"Keys: ",el("kbd",{text:"A"}),"–",el("kbd",{text:"D"})," or ",el("kbd",{text:"1"}),"–",el("kbd",{text:"4"})," to answer, ",el("kbd",{text:"Enter"})," for next."),
+        el("p",{class:"note keys"},"Shortcuts: press ",el("kbd",{text:"A"}),"–",el("kbd",{text:"D"})," or ",el("kbd",{text:"1"}),"–",el("kbd",{text:"4"})," to pick an option, ",el("kbd",{text:"Enter"})," for next."),
         Object.assign(el("button",{class:"btn primary",onclick:()=>start(),id:"startBtn"},n?`Start ${n} question${n>1?"s":""}`:"Pick at least one topic"),{disabled:!n}))
     ),
     syncPanel()
