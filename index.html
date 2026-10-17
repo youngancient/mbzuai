@@ -361,7 +361,7 @@ function renderSetup(){
 }
 function save(){store.set("mbz-cfg",cfg)}
 
-/* ---------- cloud sync (Firebase: Google sign-in, one Firestore doc per user at users/{uid}) ---------- */
+/* ---------- cloud sync (Firebase: Google sign-in, one Firestore doc per user at mbzuaiProgress/{uid}) ---------- */
 const SYNC_KEYS=["mbz-cfg","mbz-missed","mbz-hist","mbz-topics"];
 const FB_CONFIG={apiKey:"AIzaSyC9ADrVr3eZ7ni-Z12lsQ6FbqUV1jijc-Y",authDomain:"tess-896e7.firebaseapp.com",projectId:"tess-896e7",storageBucket:"tess-896e7.firebasestorage.app",messagingSenderId:"327614441328",appId:"1:327614441328:web:c194e0e9158b70a05c11b5"};
 const sync={user:null,state:"off",msg:"",timer:null,ui:null,
@@ -376,7 +376,7 @@ const sync={user:null,state:"off",msg:"",timer:null,ui:null,
     const h=new Map();[...(a.hist||[]),...(b.hist||[])].forEach(x=>h.set(x.d+":"+x.s+"/"+x.n,x));
     const t=Object.assign({},a.topics);for(const k in b.topics||{})if(!t[k]||b.topics[k].n>t[k].n)t[k]=b.topics[k];
     return {cfg:b.cfg||a.cfg||{},missed:[...m],hist:[...h.values()].sort((x,y)=>x.d-y.d).slice(-50),topics:t}},
-  doc(){return firebase.firestore().collection("users").doc(this.user.uid)},
+  doc(){return firebase.firestore().collection("mbzuaiProgress").doc(this.user.uid)},
   set(state,msg){this.state=state;this.msg=msg||"";if(this.ui)this.ui()},
   changed(){store.set("mbz-dirty",true);if(!this.user)return;clearTimeout(this.timer);this.timer=setTimeout(()=>this.push(),800)},
   async push(){if(!this.user)return;this.set("busy","Saving…");
