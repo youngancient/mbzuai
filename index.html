@@ -55,6 +55,12 @@ button:focus-visible,.opt:focus-visible{outline:2px solid var(--accent);outline-
 .check{display:flex;gap:10px;align-items:center;font-size:.95rem}
 .check input{width:18px;height:18px;accent-color:var(--accent)}
 .note{font-size:.88rem;color:var(--muted)}
+.sync{gap:0}.sync[open]{gap:18px}
+.sync summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.sync summary::-webkit-details-marker{display:none}
+.sync summary::after{content:"+";font-size:1.4rem;line-height:1;color:var(--muted)}
+.sync[open] summary::after{content:"−"}
+.sync summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:4px}
 .code{font:inherit;font-family:var(--f-mono);font-size:.8rem;width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--code);color:var(--ink);resize:vertical;word-break:break-all}
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .stat{display:flex;flex-direction:column;gap:2px}
@@ -372,8 +378,8 @@ function syncPanel(){
   const box=el("textarea",{class:"code",rows:"3",spellcheck:"false","aria-label":"Progress code",placeholder:"Paste a progress code here to import it"});
   const msg=el("p",{class:"note","aria-live":"polite"});
   const say=(t,bad)=>{msg.textContent=t;msg.style.color=bad?"var(--bad)":""};
-  return el("section",{class:"panel"},
-    el("h2",{text:"Move progress to another device"}),
+  return el("details",{class:"panel sync"},
+    el("summary",{},el("h2",{text:"Move progress to another device"})),
     el("p",{class:"note",text:"Progress is saved only in this browser. Export a code here, then import it in your other browser or on your phone. Importing replaces the progress on that device."}),
     box,
     el("div",{class:"row"},
