@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MBZUAI Prep Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one narrow exam-booklet column; answer options drawn as OMR bubble rows */
+:root{
+  --bg:#F2F4F8; --surface:#FFFFFF; --ink:#16213A; --muted:#5A6580; --line:#D8DDE8;
+  --accent:#2F4BD6; --accent-soft:#E5E9FC; --good:#1D8752; --good-soft:#E1F3E9;
+  --bad:#C0403A; --bad-soft:#FBE6E4; --warn:#9A6A00; --warn-soft:#FBF1D9; --code:#EDF0F6;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E131E; --surface:#161D2C; --ink:#E5E9F2; --muted:#97A1B7; --line:#29324A;
+  --accent:#8FA2FF; --accent-soft:#222D5A; --good:#5CC78F; --good-soft:#163426;
+  --bad:#EF817A; --bad-soft:#3B1C1C; --warn:#E8B64A; --warn-soft:#3A2E12; --code:#0F1627; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E131E; --surface:#161D2C; --ink:#E5E9F2; --muted:#97A1B7; --line:#29324A;
+  --accent:#8FA2FF; --accent-soft:#222D5A; --good:#5CC78F; --good-soft:#163426;
+  --bad:#EF817A; --bad-soft:#3B1C1C; --warn:#E8B64A; --warn-soft:#3A2E12; --code:#0F1627; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
+.wrap{max-width:720px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(1.7rem,4.5vw,2.3rem);font-weight:700;letter-spacing:-.01em}
+h2{font-size:1.2rem;font-weight:700}
+p{margin:0}
+.muted{color:var(--muted)}
+.eyebrow{font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:18px}
+.field{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.between{justify-content:space-between}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,.opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg button{background:transparent;border:0;padding:8px 14px;font-weight:500;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.chip{border:1px solid var(--line);background:transparent;border-radius:999px;padding:6px 12px;font-size:.9rem;display:inline-flex;gap:6px;align-items:center}
+.chip .n{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent);font-weight:500;font-size:.9rem}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:10px 16px;font-weight:600}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] .btn.primary{color:#0E131E}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0E131E}}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.check{display:flex;gap:10px;align-items:center;font-size:.95rem}
+.check input{width:18px;height:18px;accent-color:var(--accent)}
+.note{font-size:.88rem;color:var(--muted)}
+.code{font:inherit;font-family:var(--f-mono);font-size:.8rem;width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--code);color:var(--ink);resize:vertical;word-break:break-all}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat b{font-family:var(--f-display);font-size:1.5rem;font-variant-numeric:tabular-nums}
+.stat span{font-size:.82rem;color:var(--muted)}
+/* quiz */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;display:flex;flex-direction:column;gap:8px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.progress{height:4px;background:var(--line);border-radius:4px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.timer{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:500}
+.timer.low{color:var(--bad)}
+.qhead{display:flex;gap:10px;flex-wrap:wrap;align-items:baseline}
+.qnum{font-family:var(--f-mono);font-size:.85rem;color:var(--muted)}
+.tag{font-size:.76rem;border:1px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--muted)}
+.qtext{font-size:1.12rem;font-weight:500;line-height:1.5}
+pre{margin:0;background:var(--code);border-radius:8px;padding:12px 14px;font-family:var(--f-mono);font-size:.88rem;line-height:1.5;overflow-x:auto;white-space:pre}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-width:0}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{cursor:default}
+.bub{flex:none;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--muted);display:grid;place-items:center;font-family:var(--f-mono);font-size:.8rem;font-weight:500;color:var(--muted)}
+.otext{min-width:0;overflow-wrap:anywhere;font-family:var(--f-body)}
+.otext.mono{font-family:var(--f-mono);font-size:.92rem}
+.opt.sel .bub{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.opt.sel{border-color:var(--ink)}
+.opt.right{background:var(--good-soft);border-color:var(--good)}
+.opt.right .bub{background:var(--good);border-color:var(--good);color:var(--surface)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt.wrong .bub{background:var(--bad);border-color:var(--bad);color:var(--surface)}
+.feedback{border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;border:1px solid var(--line)}
+.feedback.ok{background:var(--good-soft);border-color:var(--good)}
+.feedback.no{background:var(--bad-soft);border-color:var(--bad)}
+.feedback strong{font-family:var(--f-display)}
+.fix{background:var(--warn-soft);border-left:3px solid var(--warn);padding:8px 12px;border-radius:4px;font-size:.9rem}
+.fix b{color:var(--warn)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:6px}
+.grid button{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:6px 0;font-family:var(--f-mono);font-size:.8rem;font-variant-numeric:tabular-nums}
+.grid button.done{background:var(--accent-soft);border-color:var(--accent)}
+.grid button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.confirm{border:1px solid var(--warn);background:var(--warn-soft);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+/* results */
+.score{font-family:var(--f-display);font-size:clamp(2.6rem,9vw,3.6rem);font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.trow{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:4px 12px;align-items:center;font-size:.92rem}
+.tbar{grid-column:1/-1;height:6px;background:var(--line);border-radius:4px;overflow:hidden}
+.tbar i{display:block;height:100%}
+.tnum{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:.85rem}
+.review{display:flex;flex-direction:column;gap:14px}
+.ritem{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:8px}
+.ans{font-size:.92rem;display:flex;flex-direction:column;gap:2px}
+.ans .y{color:var(--bad)} .ans .c{color:var(--good)}
+kbd{font-family:var(--f-mono);font-size:.78rem;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px}
+@media (max-width:480px){.stats{grid-template-columns:1fr 1fr}.panel{padding:16px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+body{margin:0}*,*::before,*::after{box-sizing:border-box}[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+const TOPICS={P:"Probability & Statistics",L:"Linear Algebra",E:"Equations & Series",C:"Calculus",Y:"Python",A:"Algorithms & Complexity",D:"Data Structures",G:"Area & Geometry",O:"Optimization",S:"CS Fundamentals"};
+const Q=[];
+// id follows the book's numbering; gap() consumes a number for a dropped duplicate so later ids (and saved stats) stay stable
+let N=0;
+function q(t,text,o,a,e,x){Q.push(Object.assign({id:++N,t,text,o,a,e},x||{}));}
+function gap(){N++}
+const DUP="The book listed the correct option twice. Duplicate replaced with a new distractor.";
+
+q("P","What is the probability of getting heads when flipping a fair coin?",["1/4","1/3","1/2","3/4"],2,"Two equally likely outcomes, one of which is heads.");
+q("P","A bag holds 5 red balls and 3 blue balls. You draw one ball without replacement. What is the probability it is blue?",["1/4","3/8","1/2","5/8"],1,"3 of the 8 balls are blue. For a single draw, replacement makes no difference.");
+q("L","What is the rank of this matrix?",["0","1","2","3"],1,"Row 2 = 2×row 1 and row 3 = 3×row 1, so only one row is linearly independent.",{c:"[1 2 3]\n[2 4 6]\n[3 6 9]",f:DUP});
+q("L","Which of the following is NOT a property of an identity matrix?",["It is a square matrix","All elements on the main diagonal are 1","All elements off the main diagonal are 0","It is not invertible"],3,"I is invertible; it is its own inverse.");
+q("E","Solve for x: 2x + 5 = 13",["x = 3","x = 4","x = 5","x = 6"],1,"2x = 8, so x = 4.");
+q("E","What comes next in the series: 2, 6, 12, 20, 30, ?",["36","38","40","42"],3,"Terms are n(n+1); differences go 4, 6, 8, 10, so the next difference is 12: 30 + 12 = 42.");
+q("Y","What is the output of this code?",["[1, 2, 3]","[1, 2, 3, 4]","[1, 2, 3, [4]]","Error"],1,"y = x makes y point to the same list object, so appending through y changes x too.",{c:"x = [1, 2, 3]\ny = x\ny.append(4)\nprint(x)"});
+q("A","What is the time complexity of binary search on a sorted array?",["O(n)","O(log n)","O(n log n)","O(n²)"],1,"Each step halves the search range.");
+q("Y","Which of the following is NOT a built-in Python data structure?",["List","Tuple","Dictionary","Array"],3,"Python has no built-in array type. Arrays come from the array module or NumPy.");
+q("D","In a binary tree, what is the maximum number of nodes at level i (root at level 0)?",["i","i²","2ⁱ","i!"],2,"Each level can at most double the previous one: 1, 2, 4, 8, …");
+q("G","A rectangle is 8 × 6 units. How many 2 × 2 tiles are needed to cover it?",["10","12","14","16"],1,"Area 48 ÷ tile area 4 = 12 (and 8 and 6 both divide by 2, so tiles fit exactly).",{f:DUP});
+q("C","What is the derivative of f(x) = 3x² + 2x − 1?",["3x + 2","6x + 2","6x² + 2","3x + 1"],1,"Power rule: 3·2x + 2 = 6x + 2.");
+q("D","In a queue, which operation removes an element?",["Enqueue","Dequeue","Push","Pop"],1,"Queues add with enqueue and remove from the front with dequeue. Push/pop are stack terms.");
+q("L","A square matrix is invertible if and only if its determinant is:",["1","0","Non-zero","Negative"],2,"det(A) ≠ 0 is equivalent to invertibility.");
+q("P","What is the probability of rolling a sum of 7 with two fair six-sided dice?",["1/6","5/36","1/12","1/36"],0,"Six pairs give 7: (1,6),(2,5),(3,4),(4,3),(5,2),(6,1). 6/36 = 1/6.",{f:DUP});
+q("L","Which of the following is NOT a type of matrix?",["Diagonal matrix","Symmetric matrix","Triangular matrix","Cylindrical matrix"],3,"Cylindrical describes coordinates, not a matrix type.");
+q("E","Solve the system: x + y = 5 and 2x − y = 1",["x = 2, y = 3","x = 3, y = 2","x = 1, y = 4","x = 4, y = 1"],0,"Add the equations: 3x = 6, so x = 2 and y = 3.",{f:DUP});
+q("E","What comes next in the series: 1, 4, 9, 16, 25, ?",["30","32","35","36"],3,"Perfect squares: 6² = 36.");
+q("Y","What is the output of this code?",["[1, 2, 3]","[2, 4, 6]","[1, 4, 9]","[1, 4, 6]"],1,"map applies func to each element, doubling it.",{c:"def func(x):\n    return x * 2\n\nprint(list(map(func, [1, 2, 3])))"});
+q("A","What is the (worst and average case) time complexity of bubble sort?",["O(log n)","O(n)","O(n log n)","O(n²)"],3,"Nested passes over the array compare up to n² pairs.");
+q("Y","Which of the following is NOT a valid way to create an empty list in Python?",["list()","[]","list([])","list{}"],3,"list{} is a syntax error. The other three all return [].");
+q("D","What is the in-order traversal of this binary tree?",["1 2 3 4 5 6 7","4 2 1 3 6 5 7","1 3 2 5 7 6 4","4 2 6 1 3 5 7"],0,"In-order visits left, root, right. On a binary search tree that gives sorted order. (Option 2 is pre-order, option 3 post-order, option 4 level-order.)",{c:"      4\n     / \\\n    2   6\n   / \\ / \\\n  1  3 5  7",f:DUP});
+q("G","A square has a perimeter of 20 units. How many 1 × 1 tiles cover its area?",["16","20","25","100"],2,"Side = 20/4 = 5, area = 25.",{f:DUP});
+q("C","What is the second derivative of f(x) = x³ − 2x² + 3x − 1?",["3x² − 4x + 3","6x − 4","6x + 4","6"],1,"f′ = 3x² − 4x + 3, f″ = 6x − 4.",{f:DUP});
+q("D","In a stack, which operation adds an element?",["Enqueue","Dequeue","Push","Pop"],2,"Push adds to the top, pop removes from the top.");
+q("L","A square matrix is invertible if and only if its columns are:",["Orthogonal","Normalized","Symmetric","Linearly independent"],3,"Independent columns mean full rank, which means invertible. Orthogonality is sufficient but not necessary.");
+q("P","What is the probability of drawing an ace from a standard 52-card deck?",["1/13","1/52","1/4","4/13"],0,"4 aces out of 52 cards = 1/13.",{f:"The book had both 1/13 and 4/52 as options, which are equal. Distractors replaced."});
+q("L","Which of the following is NOT a property of a (real) symmetric matrix?",["It is a square matrix","It equals its transpose","Its eigenvalues are real","Its determinant is always positive"],3,"Counterexample: [0 1; 1 0] is symmetric with det = −1.");
+q("E","Solve: log₂(x) = 3",["x = 3","x = 6","x = 8","x = 9"],2,"x = 2³ = 8.");
+q("E","What comes next in the series: 3, 6, 11, 18, 27, ?",["36","37","38","39"],2,"Differences are odd numbers 3, 5, 7, 9, next 11: 27 + 11 = 38.",{f:DUP});
+q("P","Two dice are rolled. What is the probability their sum is 8?",["1/6","5/36","1/8","1/12"],1,"(2,6),(3,5),(4,4),(5,3),(6,2): 5 of 36 outcomes.");
+q("L","A is a 3×3 matrix. What is the dimension of AᵀA?",["3×3","9×9","3×1","1×3"],0,"(3×3)(3×3) gives 3×3. In general an m×n matrix gives an n×n AᵀA.",{f:DUP});
+q("E","Solve: log₃(x + 1) = 2",["x = 8","x = 9","x = 26","x = 27"],0,"x + 1 = 3² = 9, so x = 8.",{f:DUP});
+q("E","What is the next number: 1, 1, 2, 3, 5, 8, 13, ?",["20","21","23","26"],1,"Fibonacci: 8 + 13 = 21.",{f:DUP});
+q("Y","What does this code print (three lines)?",["[1] / [2] / [3]","[1] / [1, 2] / [1, 2, 3]","[1] / [2] / [1, 2, 3]","Error"],1,"A default argument is created once, when the function is defined, so the same list keeps growing across calls.",{c:"def func(x, y=[]):\n    y.append(x)\n    return y\n\nprint(func(1))\nprint(func(2))\nprint(func(3))",f:DUP});
+q("A","What is the time complexity of inserting into a balanced binary search tree?",["O(1)","O(log n)","O(n)","O(n log n)"],1,"Height is O(log n), and insertion walks one root-to-leaf path.");
+q("Y","Which of the following is NOT a Python list method?",["append()","extend()","insert()","push()"],3,"Python lists use append(); push() does not exist.");
+q("D","A complete binary tree has 7 nodes. How many are leaves?",["3","4","5","7"],1,"7 nodes fill levels 0–2 perfectly: 1 + 2 + 4. The bottom level has 4 leaves.");
+q("G","A circular pool has a 10 m diameter. Roughly how many 1 × 1 m tiles cover its area?",["70","75","79","100"],2,"π·5² ≈ 78.5 m², so about 79 tiles.");
+q("C","What are the critical points of f(x) = x³ − 3x² + 2?",["x = 0 only","x = 2 only","x = 0 and x = 2","x = 1 and x = 3"],2,"f′(x) = 3x² − 6x = 3x(x − 2) = 0 gives x = 0 (local max) and x = 2 (local min).",{f:"The book's key listed only x = 2, but x = 0 is also a critical point. Options rewritten."});
+q("D","In an array-based queue that is not full, what is the time complexity of enqueue?",["O(1)","O(log n)","O(n)","O(n log n)"],0,"Write at the rear index and advance it: constant time.",{f:DUP});
+q("L","A square matrix A is orthogonal if:",["A·A = I","A + Aᵀ = I","A·Aᵀ = I","det(A) = 1"],2,"Orthogonal means Aᵀ = A⁻¹. det(A) = ±1 follows, but det = 1 alone isn't enough.");
+q("P","From a standard 52-card deck, what is P(red card or face card)?",["1/2","7/13","8/13","3/4"],2,"26 red + 12 face − 6 red face cards = 32. 32/52 = 8/13.",{f:"The book's key says 7/13, which is wrong."});
+q("L","Which of these matrices is NOT invertible?",["[1 2; 3 4]","[0 1; −1 0]","[1 2; 2 4]","[2 0; 0 3]"],2,"det = 1·4 − 2·2 = 0. Row 2 is twice row 1.");
+q("E","Solve the system: 2x + y = 7 and x − y = 1",["x = 3, y = 1","x = 8/3, y = 5/3","x = 2, y = 3","x = 4, y = −1"],1,"Add the equations: 3x = 8, so x = 8/3 and y = x − 1 = 5/3.",{f:"The book's key says x = 3, y = 1, which fails x − y = 1. None of its options were correct."});
+q("E","What comes next in the series: 2, 6, 18, 54, ?",["108","144","162","216"],2,"Geometric, ratio 3: 54 × 3 = 162.",{f:DUP});
+q("Y","What is the output of this code?",["12","16","20","24"],3,"4 × 3 × 2 × 1 × 1 = 24.",{c:"def factorial(n):\n    if n == 0:\n        return 1\n    return n * factorial(n-1)\n\nprint(factorial(4))"});
+q("A","What is the worst-case time complexity of quicksort?",["O(n)","O(n log n)","O(n²)","O(2ⁿ)"],2,"Bad pivots (e.g. always the min on sorted input) split n into 0 and n − 1.");
+q("S","Which of the following is NOT a principle of object-oriented programming?",["Encapsulation","Inheritance","Polymorphism","Fragmentation"],3,"The four pillars are encapsulation, inheritance, polymorphism and abstraction.");
+q("D","In a binary max heap with 15 elements, what is the index of the last non-leaf node (0-based)?",["5","6","7","8"],1,"Last non-leaf = ⌊n/2⌋ − 1 = 7 − 1 = 6.",{f:DUP});
+q("G","A rectangle is 12 × 8 units. How many 3 × 2 tiles cover it?",["12","16","24","32"],1,"96 ÷ 6 = 16 (4 tiles along 12, 4 along 8).",{f:DUP});
+q("C","What is ∂²f/∂x∂y for f(x, y) = x²y + xy²?",["2x + 2y","2 + 2y","2x + y²","x² + 2xy"],0,"∂f/∂y = x² + 2xy, then ∂/∂x gives 2x + 2y.",{f:"The book's key says 2 + 2y, which is wrong."});
+q("D","In a stack built on a linked list, what is the time complexity of pop?",["O(1)","O(log n)","O(n)","O(n log n)"],0,"Remove the head node: constant time.",{f:DUP});
+q("L","Matrix A is similar to B if there is an invertible P such that:",["A = PB","A = BP","A = PBP⁻¹","A = PᵀB"],2,"Similarity is A = PBP⁻¹ (equivalently A = Q⁻¹BQ with Q = P⁻¹).",{f:"The book had both PBP⁻¹ and P⁻¹BP as options. Both are valid conventions, so one was replaced."});
+q("P","A bag has 3 red, 4 blue and 5 green marbles. Draw two without replacement. P(blue, then red)?",["1/6","3/22","1/11","1/8"],2,"4/12 × 3/11 = 12/132 = 1/11.",{f:"The book's key says 1/8. None of its options were correct."});
+q("L","Which of the following is NOT a property of a positive definite matrix?",["All eigenvalues are positive","The determinant is positive","It is symmetric","It is always diagonal"],3,"[2 1; 1 2] is positive definite and not diagonal.");
+q("E","Solve: eˣ = 8",["x = 2","x = ln 8","x = 3","x = e³"],1,"Take the natural log of both sides.");
+q("E","What comes next in the series: 1, 4, 9, 16, 25, 36, ?",["47","49","64","81"],1,"7² = 49.");
+q("Y","What is the output of this code?",["1","2","3","Error"],2,"super().__init__() sets x = 1, then y = 2.",{c:"class A:\n    def __init__(self):\n        self.x = 1\n\nclass B(A):\n    def __init__(self):\n        super().__init__()\n        self.y = 2\n\nb = B()\nprint(b.x + b.y)"});
+q("A","Average time complexity of finding the kth smallest element in an unsorted array with QuickSelect?",["O(n²)","O(n log n)","O(n)","O(log n)"],2,"Each round recurses into one side only: n + n/2 + n/4 + … = O(n).");
+q("P","From a 52-card deck, what is P(king or heart)?",["4/13","1/4","17/52","3/13"],0,"4 kings + 13 hearts − 1 king of hearts = 16. 16/52 = 4/13.",{f:DUP});
+q("L","What is the rank of this matrix?",["0","1","2","3"],1,"Row 2 = 2 × row 1 and row 3 is zero, so only one independent row.",{c:"[1 2 3]\n[2 4 6]\n[0 0 0]",f:"The book's key says 2, which is wrong."});
+q("E","Solve: 2^(x+1) = 32",["x = 3","x = 4","x = 5","x = 6"],1,"32 = 2⁵, so x + 1 = 5.",{f:DUP});
+gap(); // book #64 skipped: Fibonacci series (duplicate of #34)
+q("Y","What is the output of this code?",["10","11","12","15"],1,"a=1, b=2, c keeps its default 3, d=5: total 11.",{c:"def func(a, b, c=3, d=4):\n    return a + b + c + d\nprint(func(1, 2, d=5))"});
+q("A","Time complexity of depth-first search on a graph with V vertices and E edges (adjacency list)?",["O(V)","O(E)","O(V + E)","O(V · E)"],2,"Every vertex and every edge is visited once.");
+q("Y","Which of the following is NOT a Python set method?",["union()","intersection()","difference()","append()"],3,"Sets use add(); append() belongs to lists.");
+q("D","What is the maximum possible height of a binary search tree with n nodes (height counted in edges)?",["log₂ n","n/2","n − 1","n"],2,"Inserting sorted keys makes a chain of n nodes, which has n − 1 edges.");
+q("G","A room is 15 ft × 12 ft. How many 1.5 ft square tiles cover the floor?",["60","75","80","90"],2,"10 tiles along 15 ft × 8 tiles along 12 ft = 80.",{f:DUP});
+q("C","Where does f(x) = −x² + 4x − 3 have its local maximum?",["x = 1","x = 2","x = 3","x = 4"],1,"f′ = −2x + 4 = 0 at x = 2, and f″ = −2 < 0.");
+q("D","In an array-based circular queue, what happens when the rear pointer reaches the end of the array?",["The queue is considered full","The array size is doubled","The rear pointer wraps around to the start","An error is thrown"],2,"rear = (rear + 1) mod capacity; that wrap-around is the point of a circular queue.");
+q("L","A matrix A is nilpotent if:",["Aⁿ = 0 for some positive integer n","Aⁿ = I for some positive integer n","Aⁿ = A for some positive integer n","A = Aᵀ"],0,"Aⁿ = I describes a periodic matrix, A² = A an idempotent one.",{f:DUP});
+q("P","A bag has 5 white and 7 black balls. Draw two without replacement. P(both white)?",["5/12","25/144","5/33","10/33"],2,"5/12 × 4/11 = 20/132 = 5/33.");
+q("L","Which of these matrices is symmetric?",["[1 2; 3 4]","[0 1; −1 0]","[1 2; 2 1]","[1 2; 0 1]"],2,"Symmetric means the entries mirror across the diagonal (A = Aᵀ).",{f:"In the book, option [1 0; 0 −1] was also symmetric, so two answers were right. Replaced."});
+q("E","Solve the system: 3x − 2y = 7 and x + y = 3",["x = 2, y = 1","x = 3, y = 0","x = 13/5, y = 2/5","x = 1, y = 2"],2,"x = 3 − y, so 9 − 3y − 2y = 7, y = 2/5, x = 13/5.",{f:"The book's key says x = 3, y = 0, which gives 3x − 2y = 9. None of its options were correct."});
+q("E","What comes next in the series: 1, 3, 6, 10, 15, ?",["18","20","21","24"],2,"Triangular numbers: add 2, 3, 4, 5, then 6.");
+q("Y","What is the output of this code?",["6","8","16","64"],1,"2 × 2 × 2 × 1 = 8.",{c:"def power(base, exp):\n    if exp == 0:\n        return 1\n    return base * power(base, exp - 1)\nprint(power(2, 3))"});
+q("A","What is the average-case time complexity of heapsort?",["O(n)","O(n log n)","O(n²)","O(log n)"],1,"n extractions, each O(log n). Heapsort is O(n log n) in every case.");
+q("S","Which is NOT a characteristic of a pure function?",["Always returns the same output for the same input","Doesn't modify external state","Has no side effects","Can access and modify global variables"],3,"Modifying globals is a side effect.");
+q("D","A max heap has 31 elements. What is its height (in edges)?",["3","4","5","6"],1,"31 = 2⁵ − 1 nodes fill 5 levels (0–4), so height 4.",{f:DUP});
+q("G","A triangle has base 8 and height 6. What is its area?",["20","22","24","48"],2,"½ × 8 × 6 = 24 square units.");
+q("C","What is the derivative of f(x) = sin(x)·cos(x)?",["cos²x − sin²x","2 sin x cos x","−sin x cos x","sin²x − cos²x"],0,"Product rule: cos·cos + sin·(−sin). This also equals cos 2x.",{f:DUP});
+q("D","Time complexity of inserting a node at the head of a doubly linked list?",["O(n)","O(1)","O(log n)","O(n log n)"],1,"Update a fixed number of pointers.");
+q("L","The trace of a square matrix is:",["The sum of all elements","The product of diagonal elements","The sum of diagonal elements","Its determinant"],2,"tr(A) = Σ aᵢᵢ. It also equals the sum of eigenvalues.");
+gap(); // book #85 skipped: dice sum 7 (duplicate of #15)
+q("L","Which of the following is NOT a property of an orthogonal matrix?",["Its transpose equals its inverse","The dot product of any two distinct rows is zero","Its columns form an orthonormal set","Its determinant is always positive"],3,"det = ±1. A reflection such as [1 0; 0 −1] has det −1.");
+q("E","Solve: log₂(x) + log₂(x − 3) = 3",["x = 5","x = (3 + √41)/2","x = 8","x = 4"],1,"log₂[x(x − 3)] = 3, so x² − 3x − 8 = 0. Keep the root with x > 3: (3 + √41)/2 ≈ 4.70.",{f:"The book's key says x = 5, but log₂5 + log₂2 = log₂10 ≠ 3."});
+q("E","What comes next in the series: 3, 5, 8, 13, 21, ?",["29","31","33","34"],3,"Each term is the sum of the previous two: 13 + 21 = 34.");
+q("Y","What is the output of this code?",["1 1","1 2","2 2","Error"],1,"B inherits x = 1 from A; C overrides it with 2.",{c:"class A:\n    x = 1\n\nclass B(A):\n    pass\n\nclass C(A):\n    x = 2\n\nprint(B.x, C.x)"});
+q("A","Time complexity of finding the diameter of a binary tree (single DFS)?",["O(1)","O(log n)","O(n)","O(n²)"],2,"One post-order pass computes each subtree's height and the best path through each node.");
+q("D","Evaluate the postfix expression: 5 3 + 8 2 − *",["40","48","56","64"],1,"(5 + 3) × (8 − 2) = 8 × 6 = 48.");
+q("D","In a min-heap, how does a parent relate to its children?",["Parent is always greater than its children","Parent is less than or equal to its children","Parent is always equal to its children","No specific relationship"],1,"That ordering puts the minimum at the root.");
+gap(); // book #93 skipped: balanced BST insert (duplicate of #36)
+q("A","Solve the recurrence T(n) = 2T(n/2) + n",["O(n)","O(n log n)","O(n²)","O(2ⁿ)"],1,"Master theorem case 2 (a = b = 2, f(n) = n): the merge sort recurrence.");
+q("D","Which is NOT a standard way to traverse a binary tree?",["Inorder","Preorder","Postorder","Middleorder"],3,"Middleorder isn't a term. The fourth standard traversal is level-order (BFS).");
+q("S","What is 5 << 2 in 8-bit binary?",["00010100","00001010","00100000","00000101"],0,"Shifting left by 2 multiplies by 4: 20 = 00010100.",{f:DUP});
+q("S","In graph theory, what is a bridge?",["An edge connecting vertices of different colors","An edge whose removal disconnects the graph","A vertex connecting two disjoint subgraphs","A path visiting every vertex exactly once"],1,"A vertex with that property is an articulation point; option 4 describes a Hamiltonian path.");
+q("A","What is the (average-case) space complexity of quicksort?",["O(1)","O(log n)","O(n)","O(n log n)"],1,"In-place partitioning, but the recursion stack is O(log n) deep on average (O(n) worst case).");
+q("L","What is the rank of a zero matrix?",["0","1","Undefined","Depends on its dimensions"],0,"It has no linearly independent rows or columns.");
+q("Y","What is the output of this code?",["3","5","8","13"],1,"mystery is Fibonacci: F(5) = 5 (0, 1, 1, 2, 3, 5).",{c:"def mystery(n):\n    if n <= 1:\n        return n\n    return mystery(n-1) + mystery(n-2)\n\nprint(mystery(5))",f:DUP});
+q("D","Which data structure best implements LIFO (Last In, First Out)?",["Queue","Linked list","Stack","Binary tree"],2,"Stacks are LIFO by definition; queues are FIFO.");
+gap(); // book #102 skipped: quickselect (duplicate of #60)
+q("P","What is 5C3 (5 choose 3)?",["5","6","10","20"],2,"5! / (3!·2!) = 120 / 12 = 10.");
+q("S","Which is NOT a property of a good hash function?",["Deterministic output","Uniform distribution of hash values","Fast computation","Reversibility"],3,"Hashes are one-way; you don't need (or want, for security) to recover the input.");
+q("S","What is the purpose of the volatile keyword in C++?",["Make a variable constant","Allocate memory dynamically","Prevent compiler optimizations on the variable","Declare a variable as thread-local"],2,"Every access must actually read or write memory, e.g. for hardware registers.");
+q("S","In graph algorithms, what does DFS stand for?",["Direct First Search","Depth First Search","Data Flow Search","Directed Forest Search"],1,"Depth First Search.");
+q("S","What is 7 % 3 in most programming languages?",["0","1","2","3"],1,"7 = 2 × 3 + 1.");
+q("A","Which sorting algorithm uses divide-and-conquer?",["Bubble sort","Insertion sort","Merge sort","Selection sort"],2,"Merge sort splits, sorts halves recursively, then merges.");
+q("D","Time complexity of looking up an element in a hash table?",["O(1) on average","O(log n)","O(n)","O(n log n)"],0,"O(1) average; O(n) worst case if everything collides.");
+q("S","In Boolean algebra, what is A AND (NOT A)?",["A","NOT A","False","True"],2,"A and NOT A can never both be true (law of contradiction).");
+q("S","What is the purpose of the virtual keyword in C++?",["Create a static method","Declare a constant variable","Enable runtime polymorphism","Allocate memory dynamically"],2,"Virtual functions are dispatched by the object's actual type at runtime.");
+q("A","Which is NOT an algorithm for finding shortest paths in a graph?",["Dijkstra's algorithm","Bellman-Ford algorithm","Floyd-Warshall algorithm","Quicksort"],3,"Quicksort sorts arrays.");
+q("S","What is the 2's complement of the 5-bit binary number 10110?",["01001","01010","10110","11010"],1,"Invert bits (01001), then add 1: 01010.");
+q("D","Maximum number of nodes in a binary tree of height h (root at height 0)?",["2ʰ","2^(h+1) − 1","h²","2h + 1"],1,"1 + 2 + 4 + … + 2ʰ = 2^(h+1) − 1.");
+q("D","Main advantage of a B-tree over a binary search tree?",["Simpler implementation","Less memory usage","Better performance for disk access","Guaranteed O(log n) search time"],2,"Wide nodes mean far fewer levels, so far fewer disk reads. (Balanced BSTs also guarantee O(log n).)");
+q("S","Which is NOT a valid state for a thread?",["Running","Blocked","Waiting","Compiling"],3,"Compiling happens before a program runs.");
+q("S","What does static do on a Java class method?",["Makes the method final","Makes the method abstract","Lets it be called without creating an instance","Restricts calls to within the class"],2,"Static methods belong to the class itself.");
+q("S","In databases, what does ACID stand for?",["Atomicity, Consistency, Isolation, Durability","Aggregation, Concurrency, Indexing, Distribution","Authentication, Caching, Integrity, Deletion","Abstraction, Complexity, Integration, Decomposition"],0,"The four guarantees of reliable transactions.");
+gap(); // book #119 skipped: binary search (duplicate of #8)
+q("S","Which is NOT a common use of bitwise operations?",["Setting/clearing/toggling bits","Checking if a number is a power of 2","Fast multiplication or division by 2","Sorting an array"],3,"Power of 2 check: n & (n − 1) == 0. Shifts multiply or divide by 2.");
+q("C","What is the derivative of sin(x)?",["cos(x)","−cos(x)","−sin(x)","tan(x)"],0,"d/dx sin x = cos x.",{f:DUP});
+q("P","What is the expected value of a fair six-sided die roll?",["3","3.5","4","6"],1,"(1 + 2 + … + 6)/6 = 21/6 = 3.5.");
+q("L","What is the rank of a matrix?",["The number of rows","The number of columns","The number of linearly independent rows (or columns)","The sum of all elements"],2,"Row rank always equals column rank.");
+q("O","In optimization, what does LP stand for?",["Lagrange Problem","Least Pairs","Linear Programming","Local Positioning"],2,"Optimizing a linear objective under linear constraints.");
+q("Y","What is the output of this code?",["64","512","72","36"],1,"** is right-associative: 2 ** (3 ** 2) = 2 ** 9 = 512.",{c:"print(2 ** 3 ** 2)"});
+q("C","What is the second derivative of f(x) = x³ + 2x² − 5x + 1?",["3x² + 4x − 5","6x + 4","6x − 5","6"],1,"f′ = 3x² + 4x − 5, f″ = 6x + 4.");
+q("P","What is the variance of a discrete random variable X?",["E[X]","E[X²]","E[X²] − (E[X])²","(E[X])² − E[X²]"],2,"Var(X) = E[(X − μ)²] = E[X²] − μ².");
+q("L","What is the determinant of the 2×2 matrix [[a, b], [c, d]]?",["a + d − b − c","ac − bd","ad − bc","ab + cd"],2,"Main diagonal product minus off-diagonal product.");
+q("O","Which is NOT an optimization algorithm?",["Gradient descent","Newton's method","Simulated annealing","Fourier transform"],3,"The Fourier transform changes signal representation; it optimizes nothing.");
+q("Y","What does this code print?",["[1, 3, 5, 7, 9]","[0, 2, 4, 6, 8]","[2, 4, 6, 8]","[0, 1, …, 9]"],1,"range(10) starts at 0, and 0 % 2 == 0.",{c:"print([i for i in range(10) if i % 2 == 0])"});
+q("C","What is ∫ sec²(x) dx?",["sin(x) + C","cos(x) + C","tan(x) + C","sec(x) + C"],2,"d/dx tan x = sec² x.");
+q("P","In a normal distribution, roughly what share of data lies within one standard deviation of the mean?",["About 50%","About 68%","About 95%","About 99.7%"],1,"The 68–95–99.7 rule (68.27% exactly).",{f:"The book had both 68% and 68.27% as options. Rewritten."});
+gap(); // book #133 skipped: orthogonal NOT property (duplicate of #86)
+q("O","What is the simplex algorithm for?",["Shortest paths in a graph","Sorting an array efficiently","Solving linear programming problems","Optimizing neural network weights"],2,"It moves along vertices of the feasible polytope.");
+q("Y","What is the output of this code?",["123","6","\"123\"","[1, 2, 3]"],1,"map(int, \"123\") yields 1, 2, 3; sum = 6.",{c:"print(sum(map(int, \"123\")))"});
+q("C","What is the limit of (1 + 1/n)ⁿ as n → ∞?",["1","2","e","∞"],2,"This is one definition of e ≈ 2.718.");
+q("P","What is the conditional probability P(A | B)?",["P(A) + P(B)","P(A)·P(B)","P(A ∩ B) / P(B)","P(B) / P(A)"],2,"Restrict to outcomes where B happened.");
+q("L","What are the eigenvalues of [[λ, 0], [0, λ]]?",["λ (repeated twice)","2λ","λ²","0"],0,"It's λI, so every vector is an eigenvector with eigenvalue λ.");
+q("O","Which is NOT a convex optimization problem?",["Linear programming","Quadratic programming with PSD matrices","Least squares","Integer programming"],3,"Integer constraints make the feasible set non-convex.");
+q("Y","What does this code print?",["[9, 6, 5, 5, 5, 4, 3, 3, 2, 1, 1]","[1, 1, 2, 3, 3, 4, 5, 5, 5, 6, 9]","[3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5]","[1, 1, 3, 3, 5, 5, 5, 9]"],1,"sorted() returns ascending order and keeps duplicates.",{c:"print(sorted([3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5]))"});
+q("C","What is the Taylor series of eˣ around x = 0?",["1 + x + x²/2 + x³/3 + …","x + x²/2! + x³/3! + …","1 + x + x²/2! + x³/3! + … + xⁿ/n! + …","1 − x + x²/2! − x³/3! + …"],2,"Every derivative of eˣ is 1 at 0, giving Σ xⁿ/n!. Option 4 is e⁻ˣ.",{f:"In the book, two options were the same correct series. Distractors replaced."});
+q("P","In a binomial distribution with n trials and success probability p, what is the expected number of successes?",["n/p","np²","np","n(1 − p)"],2,"Sum of n Bernoulli means p.");
+gap(); // book #143 skipped: trace (duplicate of #84)
+q("O","Which is NOT a standard method for constrained optimization?",["Lagrange multipliers","Penalty methods","Barrier methods","Monte Carlo methods"],3,"Monte Carlo is random sampling for estimation, not a constraint-handling technique.");
+q("Y","What does this code print?",["[1, 3, 5, 7, 9]","[0, 2, 4, 6, 8]","[2, 4, 6, 8]","[0, 1, …, 9]"],1,"filter keeps elements where the lambda is True; 0 is even.",{c:"print(list(filter(lambda x: x % 2 == 0, range(10))))"});
+q("C","What is ∫₁ᵉ (1/x) dx?",["e − 1","0","1","e"],2,"ln(e) − ln(1) = 1 − 0 = 1.",{f:"In the book, 'ln(e) − ln(1)' and '1' were both options and both correct. Replaced."});
+q("P","In a Poisson distribution with mean λ, what is the variance?",["λ²","√λ","λ","1/λ"],2,"For Poisson, mean = variance = λ.");
+q("L","What is the null space of a matrix A?",["All vectors v with Av = 1","All vectors v with Av = 0","The set of A's eigenvalues","The set of A's singular values"],1,"Also called the kernel.");
+q("O","Which is NOT a step of gradient descent?",["Choose an initial point","Compute the gradient at the current point","Move in the direction of the negative gradient","Randomly select the next point"],3,"Gradient descent is deterministic: x ← x − η∇f(x).");
+q("Y","What does this code print?",["5","9","[9]","[1, 2, 3, 4, 5, 6, 9]"],1,"set removes duplicates; max returns the single largest element.",{c:"print(max(set([3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5])))"});
+q("C","What is the Maclaurin series of cos(x)?",["1 − x²/2! + x⁴/4! − x⁶/6! + …","1 + x²/2! + x⁴/4! + …","x − x³/3! + x⁵/5! − …","1 − x + x²/2! − x³/3! + …"],0,"Even powers with alternating signs. Option 2 is cosh x, option 3 is sin x.",{f:"In the book, two options were the same correct series. Distractors replaced."});
+q("P","In a geometric distribution with success probability p, what is the expected number of trials until the first success?",["p","1 − p","p/(1 − p)","1/p"],3,"E.g. p = 1/6 for a die: on average 6 rolls.");
+q("L","What is the rank of this matrix?",["0","1","2","3"],1,"Every row is a multiple of [1, 2, 3].",{c:"[[1, 2, 3],\n [2, 4, 6],\n [3, 6, 9]]"});
+q("O","Which is NOT a method for unconstrained optimization?",["Newton's method","Quasi-Newton methods","Conjugate gradient method","Simplex method"],3,"Simplex solves linear programs, which are constrained.");
+q("Y","What does this code do in Python 3 (no imports)?",["Prints 15","Prints 120","Prints 0","Raises NameError"],3,"In Python 3, reduce lives in functools. With `from functools import reduce` it would print 120 (1·2·3·4·5).",{c:"print(reduce(lambda x, y: x*y, range(1, 6)))",f:"The book's key says 120, but without the import this line raises NameError."});
+
+/* ---------- state & storage ---------- */
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let cfg=Object.assign({mode:"practice",topics:Object.keys(TOPICS),len:20,timer:0,missedOnly:false},store.get("mbz-cfg",{}));
+let S=null; let tick=null;
+const $=s=>document.querySelector(s);
+const app=$("#app");
+const el=(tag,attrs,...kids)=>{const n=document.createElement(tag);for(const k in attrs||{}){if(k==="class")n.className=attrs[k];else if(k==="text")n.textContent=attrs[k];else if(k.startsWith("on"))n.addEventListener(k.slice(2),attrs[k]);else n.setAttribute(k,attrs[k]);}kids.flat().forEach(c=>c!=null&&n.append(c.nodeType?c:document.createTextNode(c)));return n;};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const LET="ABCD";
+
+function pool(){const missed=new Set(store.get("mbz-missed",[]));return Q.filter(x=>cfg.topics.includes(x.t)&&(!cfg.missedOnly||missed.has(x.id)));}
+
+/* ---------- setup ---------- */
+function renderSetup(){
+  clearInterval(tick); S=null; store.set("mbz-session",null);
+  const missed=store.get("mbz-missed",[]); const hist=store.get("mbz-hist",[]);
+  if(!missed.length) cfg.missedOnly=false;
+  const p=pool(); const n=cfg.len==="all"?p.length:Math.min(cfg.len,p.length);
+  const seg=(key,vals,labels)=>el("div",{class:"seg",role:"group"},vals.map((v,i)=>el("button",{"aria-pressed":String(cfg[key]===v),onclick:()=>{cfg[key]=v;save();renderSetup()}},labels[i])));
+  const counts={};Q.forEach(x=>counts[x.t]=(counts[x.t]||0)+1);
+  const fixedN=Q.filter(x=>x.f&&x.f!==DUP).length;
+  const best=hist.length?Math.max(...hist.map(h=>Math.round(100*h.s/h.n))):null;
+  const tstats=store.get("mbz-topics",{});
+  const tried=Object.keys(TOPICS).filter(t=>tstats[t]&&tstats[t].n>0).sort((a,b)=>tstats[a].r/tstats[a].n-tstats[b].r/tstats[b].n||tstats[b].n-tstats[a].n);
+  const untried=Object.keys(TOPICS).filter(t=>!tried.includes(t));
+  const weakest=tried[0];
+  const drill=t=>start(Q.filter(x=>x.t===t).map(x=>x.id));
+  const weakPanel=el("section",{class:"panel"},
+    el("div",{class:"row between"},el("h2",{text:"Your weak areas"}),
+      tried.length?el("button",{class:"linkbtn",onclick:()=>{store.set("mbz-topics",{});renderSetup()}},"Reset stats"):null),
+    tried.length?el("p",{class:"note",text:"Accuracy per topic across every quiz you've taken, weakest first."}):
+      el("p",{class:"note",text:"Take a quiz and your accuracy in each topic will build up here, weakest first, so you know what to drill."}),
+    ...tried.map(t=>{const v=tstats[t],p=v.r/v.n;return el("div",{class:"trow"},
+      el("span",{text:TOPICS[t]}),el("span",{class:"tnum",text:`${Math.round(p*100)}% · ${v.n}`}),
+      el("div",{class:"tbar"},el("i",{style:`width:${Math.max(p*100,2)}%;background:var(${p>=.875?"--good":p>=.6?"--warn":"--bad"})`})))}),
+    tried.length&&untried.length?el("p",{class:"note",text:"Not tried yet: "+untried.map(t=>TOPICS[t]).join(", ")+"."}):null,
+    weakest?el("div",{class:"row"},el("button",{class:"btn primary",onclick:()=>drill(weakest)},`Drill ${TOPICS[weakest]}`),
+      el("span",{class:"note",text:`All ${Q.filter(x=>x.t===weakest).length} questions, practice mode`})):null);
+  app.replaceChildren(
+    el("header",{class:"field"},
+      el("span",{class:"eyebrow",text:"Master's admission test practice"}),
+      el("h1",{text:"MBZUAI Prep Quiz"}),
+      el("p",{class:"muted",text:`${Q.length} questions from your prep book, with the answers hidden and the key checked. ${fixedN} wrong answers in the book have been corrected, and duplicate options replaced. Options are shuffled each time, so you learn the answer, not the letter.`})
+    ),
+    el("section",{class:"panel"},
+      el("div",{class:"stats"},
+        el("div",{class:"stat"},el("b",{text:String(hist.length)}),el("span",{text:"quizzes taken"})),
+        el("div",{class:"stat"},el("b",{text:best==null?"—":best+"%"}),el("span",{text:"best score"})),
+        el("div",{class:"stat"},el("b",{text:String(missed.length)}),el("span",{text:"in your missed pile"}))
+      )
+    ),
+    weakPanel,
+    el("section",{class:"panel"},
+      el("div",{class:"field"},el("span",{class:"eyebrow",text:"Mode"}),
+        seg("mode",["practice","exam"],["Practice · feedback each question","Mock exam · results at the end"])),
+      el("div",{class:"field"},
+        el("div",{class:"row between"},el("span",{class:"eyebrow",text:"Topics"}),
+          el("div",{class:"row"},el("button",{class:"linkbtn",onclick:()=>{cfg.topics=Object.keys(TOPICS);save();renderSetup()}},"All"),el("span",{class:"muted",text:"·"}),el("button",{class:"linkbtn",onclick:()=>{cfg.topics=[];save();renderSetup()}},"None"))),
+        el("div",{class:"row"},Object.keys(TOPICS).map(k=>el("button",{class:"chip","aria-pressed":String(cfg.topics.includes(k)),onclick:()=>{cfg.topics=cfg.topics.includes(k)?cfg.topics.filter(t=>t!==k):[...cfg.topics,k];save();renderSetup()}},TOPICS[k],el("span",{class:"n",text:String(counts[k])}))))
+      ),
+      el("div",{class:"field"},el("span",{class:"eyebrow",text:"Length"}),
+        seg("len",[10,20,40,"all"],["10","20","40 (test length)","All "+p.length])),
+      cfg.mode==="exam"?el("div",{class:"field"},el("span",{class:"eyebrow",text:"Time limit"}),
+        seg("timer",[0,30,45,60,90],["None","30 min","45 min","60 min","90 min"]),
+        el("p",{class:"note",text:"Set it to match the time your test invitation gives you."})):null,
+      el("label",{class:"check"},
+        Object.assign(el("input",{type:"checkbox",id:"missedOnly"}),{checked:cfg.missedOnly,disabled:!missed.length,onchange:e=>{cfg.missedOnly=e.target.checked;save();renderSetup()}}),
+        missed.length?`Only questions I've missed before (${missed.length})`:"Only questions I've missed before (none yet)"),
+      el("div",{class:"row between"},
+        el("p",{class:"note"},"Keys: ",el("kbd",{text:"A"}),"–",el("kbd",{text:"D"})," or ",el("kbd",{text:"1"}),"–",el("kbd",{text:"4"})," to answer, ",el("kbd",{text:"Enter"})," for next."),
+        Object.assign(el("button",{class:"btn primary",onclick:()=>start(),id:"startBtn"},n?`Start ${n} question${n>1?"s":""}`:"Pick at least one topic"),{disabled:!n}))
+    ),
+    syncPanel()
+  );
+}
+function save(){store.set("mbz-cfg",cfg)}
+
+/* ---------- export / import (progress lives per browser, so this moves it between devices) ---------- */
+const SYNC_KEYS=["mbz-cfg","mbz-missed","mbz-hist","mbz-topics"], SYNC_PREFIX="MBZ1:";
+function exportCode(){const d={};SYNC_KEYS.forEach(k=>d[k]=store.get(k,null));return SYNC_PREFIX+btoa(JSON.stringify(d))}
+function importCode(code){
+  code=code.trim(); if(!code.startsWith(SYNC_PREFIX))throw new Error("That doesn't look like a progress code from this site.");
+  let d; try{d=JSON.parse(atob(code.slice(SYNC_PREFIX.length)))}catch(e){throw new Error("The code is incomplete or damaged. Copy it again in full.")}
+  if(!d||typeof d!=="object"||!SYNC_KEYS.some(k=>d[k]!=null))throw new Error("The code has no progress in it.");
+  SYNC_KEYS.forEach(k=>store.set(k,d[k]==null?(k==="mbz-cfg"?{}:k==="mbz-topics"?{}:[]):d[k]));
+  cfg=Object.assign({mode:"practice",topics:Object.keys(TOPICS),len:20,timer:0,missedOnly:false},store.get("mbz-cfg",{}));
+}
+function syncPanel(){
+  const box=el("textarea",{class:"code",rows:"3",spellcheck:"false","aria-label":"Progress code",placeholder:"Paste a progress code here to import it"});
+  const msg=el("p",{class:"note","aria-live":"polite"});
+  const say=(t,bad)=>{msg.textContent=t;msg.style.color=bad?"var(--bad)":""};
+  return el("section",{class:"panel"},
+    el("h2",{text:"Move progress to another device"}),
+    el("p",{class:"note",text:"Progress is saved only in this browser. Export a code here, then import it in your other browser or on your phone. Importing replaces the progress on that device."}),
+    box,
+    el("div",{class:"row"},
+      el("button",{class:"btn",onclick:async()=>{box.value=exportCode();box.select();
+        try{await navigator.clipboard.writeText(box.value);say("Code copied. Paste it into Import on your other device.")}catch(e){say("Code ready. Copy it from the box above.")}}},"Export"),
+      el("button",{class:"btn",onclick:()=>{if(!box.value.trim())return say("Paste a code into the box first.",true);
+        try{importCode(box.value);renderSetup();window.scrollTo(0,0)}catch(e){say(e.message,true)}}},"Import")),
+    msg);
+}
+function saveSession(){store.set("mbz-session",S&&{mode:S.mode,i:S.i,end:S.end,items:S.items.map(t=>({id:t.q.id,ord:t.ord,pick:t.pick}))})}
+function resume(){
+  const v=store.get("mbz-session",null); if(!v||!v.items||!v.items.length)return false;
+  const byId=new Map(Q.map(x=>[x.id,x])); const items=v.items.filter(t=>byId.has(t.id)).map(t=>({q:byId.get(t.id),ord:t.ord,pick:t.pick}));
+  if(!items.length){store.set("mbz-session",null);return false}
+  S={mode:v.mode,items,i:Math.min(v.i||0,items.length-1),confirm:false,end:v.end||null};
+  if(S.end&&S.end<=Date.now()){finish();return true}
+  if(S.end) tick=setInterval(updTimer,1000);
+  renderQ(); return true;
+}
+
+/* ---------- quiz ---------- */
+function start(ids){
+  let p=ids?Q.filter(x=>ids.includes(x.id)):pool();
+  p=shuffle(p); if(!ids&&cfg.len!=="all") p=p.slice(0,cfg.len);
+  S={mode:ids?"practice":cfg.mode,items:p.map(x=>({q:x,ord:shuffle([0,1,2,3]),pick:null})),i:0,confirm:false,
+     end:(!ids&&cfg.mode==="exam"&&cfg.timer)?Date.now()+cfg.timer*60000:null};
+  clearInterval(tick); if(S.end) tick=setInterval(updTimer,1000);
+  saveSession(); renderQ(); window.scrollTo(0,0);
+}
+function fmt(ms){ms=Math.max(0,ms);const m=Math.floor(ms/60000),s=Math.floor(ms%60000/1000);return m+":"+String(s).padStart(2,"0")}
+function updTimer(){const t=$("#timer");if(!S||!S.end)return;const left=S.end-Date.now();if(t){t.textContent=fmt(left);t.classList.toggle("low",left<120000)}if(left<=0){clearInterval(tick);finish()}}
+
+function renderQ(){
+  const it=S.items[S.i], x=it.q, n=S.items.length, exam=S.mode==="exam", answered=it.pick!=null;
+  const done=S.items.filter(i=>i.pick!=null).length;
+  const opts=el("div",{class:"opts",role:"radiogroup"},it.ord.map((oi,pos)=>{
+    let cls="opt";
+    if(exam){if(it.pick===oi)cls+=" sel"}
+    else if(answered){if(oi===x.a)cls+=" right";else if(oi===it.pick)cls+=" wrong"}
+    const b=el("button",{class:cls,role:"radio","aria-checked":String(it.pick===oi),onclick:()=>choose(oi)},
+      el("span",{class:"bub",text:LET[pos]}),
+      el("span",{class:"otext"+(/^\[.*\]$/.test(x.o[oi])?" mono":""),text:x.o[oi]}));
+    if(!exam&&answered)b.disabled=true;
+    return b;
+  }));
+  const kids=[
+    el("div",{class:"bar"},
+      el("div",{class:"row between"},
+        el("span",{class:"eyebrow",text:exam?"Mock exam":"Practice"}),
+        el("div",{class:"row"},S.end?el("span",{class:"timer",id:"timer",text:fmt(S.end-Date.now())}):null,
+          el("button",{class:"linkbtn",onclick:()=>exam?(S.confirm=true,renderQ()):finish()},exam?"Submit":"End & see results"))),
+      el("div",{class:"progress"},el("i",{style:`width:${100*done/n}%`}))
+    ),
+    el("section",{class:"panel"},
+      el("div",{class:"qhead"},el("span",{class:"qnum",text:`Question ${S.i+1} of ${n}`}),el("span",{class:"tag",text:TOPICS[x.t]}),el("span",{class:"qnum",text:`Book #${x.id}`})),
+      el("p",{class:"qtext",text:x.text}),
+      x.c?el("pre",{},x.c):null,
+      opts,
+      (!exam&&answered)?feedback(it):null
+    )
+  ];
+  if(exam&&S.confirm){
+    const un=n-done;
+    kids.push(el("div",{class:"confirm"},el("p",{},un?`${un} question${un>1?"s are":" is"} unanswered. Submit anyway?`:"Submit your answers and see your score?"),
+      el("div",{class:"row"},el("button",{class:"btn primary",onclick:finish},"Submit"),el("button",{class:"btn",onclick:()=>{S.confirm=false;renderQ()}},"Keep working"))));
+  }
+  const nav=el("div",{class:"row between"},
+    el("button",{class:"btn",onclick:()=>go(-1)},"← Previous"),
+    S.i<n-1?Object.assign(el("button",{class:"btn primary",onclick:()=>go(1)},exam?"Next →":(answered?"Next →":"Skip →")),{}):
+      el("button",{class:"btn primary",onclick:()=>exam?(S.confirm=true,renderQ()):finish()},exam?"Submit":"See results"));
+  nav.firstChild.disabled=S.i===0;
+  kids.push(nav);
+  if(exam) kids.push(el("section",{class:"panel"},el("span",{class:"eyebrow",text:`Answer sheet · ${done} of ${n} marked`}),
+    el("div",{class:"grid"},S.items.map((t,k)=>el("button",{class:(t.pick!=null?"done":"")+(k===S.i?" cur":""),"aria-label":`Go to question ${k+1}`,onclick:()=>{S.i=k;saveSession();renderQ()}},String(k+1))))));
+  app.replaceChildren(...kids);
+}
+function feedback(it){
+  const x=it.q, ok=it.pick===x.a;
+  return el("div",{class:"feedback "+(ok?"ok":"no")},
+    el("strong",{text:ok?"Correct.":`Not quite. The answer is ${LET[it.ord.indexOf(x.a)]}: ${x.o[x.a]}`}),
+    el("p",{text:x.e}),
+    (x.f&&x.f!==DUP)?el("p",{class:"fix"},el("b",{text:"Fixed from the book. "}),x.f):null);
+}
+function choose(oi){const it=S.items[S.i];if(S.mode==="practice"&&it.pick!=null)return;it.pick=(S.mode==="exam"&&it.pick===oi)?null:oi;saveSession();renderQ();}
+function go(d){S.i=Math.max(0,Math.min(S.items.length-1,S.i+d));S.confirm=false;saveSession();renderQ();window.scrollTo({top:0});}
+
+/* ---------- results ---------- */
+function finish(){
+  clearInterval(tick); store.set("mbz-session",null);
+  // practice: skipped questions are excluded everywhere; exam: unanswered count as wrong
+  const items=S.mode==="exam"?S.items:S.items.filter(i=>i.pick!=null), n=items.length, right=items.filter(i=>i.pick===i.q.a).length;
+  const missed=new Set(store.get("mbz-missed",[]));
+  items.forEach(i=>{if(i.pick===i.q.a)missed.delete(i.q.id);else missed.add(i.q.id)});
+  store.set("mbz-missed",[...missed]);
+  const hist=store.get("mbz-hist",[]);if(n)hist.push({s:right,n,d:Date.now()});store.set("mbz-hist",hist.slice(-50));
+  const byT={};items.forEach(i=>{const t=i.q.t;byT[t]=byT[t]||{r:0,n:0};byT[t].n++;if(i.pick===i.q.a)byT[t].r++});
+  const wrong=items.filter(i=>i.pick!==i.q.a);
+  const ts=store.get("mbz-topics",{});
+  items.forEach(i=>{const t=i.q.t;ts[t]=ts[t]||{r:0,n:0};ts[t].n++;if(i.pick===i.q.a)ts[t].r++});
+  store.set("mbz-topics",ts);
+  const pct=n?Math.round(100*right/n):0, out40=n?Math.round(40*right/n):0, skipped=S.items.length-n;
+  let showAll=false;
+  const review=el("div",{class:"review"});
+  const fill=()=>{review.replaceChildren(...(showAll?items:wrong).map(i=>{const x=i.q,ok=i.pick===x.a;return el("div",{class:"ritem"},
+    el("div",{class:"qhead"},el("span",{class:"qnum",text:`Book #${x.id}`}),el("span",{class:"tag",text:TOPICS[x.t]})),
+    el("p",{style:"font-weight:500",text:x.text}),x.c?el("pre",{},x.c):null,
+    el("div",{class:"ans"},
+      ok?null:el("span",{class:"y",text:"Your answer: "+(i.pick==null?"no answer":x.o[i.pick])}),
+      el("span",{class:"c",text:"Correct: "+x.o[x.a]})),
+    el("p",{class:"note",text:x.e}),
+    (x.f&&x.f!==DUP)?el("p",{class:"fix"},el("b",{text:"Fixed from the book. "}),x.f):null)}));
+    if(!review.children.length)review.append(el("p",{class:"muted",text:"Nothing missed. Clean sheet."}));};
+  fill();
+  app.replaceChildren(
+    el("header",{class:"field"},el("span",{class:"eyebrow",text:S.mode==="exam"?"Mock exam results":"Practice results"}),
+      el("div",{class:"score",text:`${right} / ${n}`}),
+      el("p",{class:"muted",text:`${skipped?`${skipped} skipped and not scored. `:""}${pct}% correct. On a 40-question test that's about ${out40}/40${out40>=35?", above the 35 target.":`; the target is 35.`}`})),
+    el("section",{class:"panel"},el("h2",{text:"By topic"}),
+      ...Object.keys(byT).sort((a,b)=>byT[a].r/byT[a].n-byT[b].r/byT[b].n).map(t=>{const v=byT[t],p=v.r/v.n;return el("div",{class:"trow"},
+        el("span",{text:TOPICS[t]}),el("span",{class:"tnum",text:`${v.r}/${v.n}`}),
+        el("div",{class:"tbar"},el("i",{style:`width:${Math.max(p*100,2)}%;background:var(${p>=.875?"--good":p>=.6?"--warn":"--bad"})`})))})),
+    el("div",{class:"row"},
+      Object.assign(el("button",{class:"btn primary",onclick:()=>start(wrong.map(i=>i.q.id))},`Retry the ${wrong.length} I missed`),{disabled:!wrong.length}),
+      el("button",{class:"btn",onclick:renderSetup},"New quiz")),
+    el("section",{class:"panel"},
+      el("div",{class:"row between"},el("h2",{text:"Review"}),
+        el("button",{class:"linkbtn",onclick:e=>{showAll=!showAll;e.target.textContent=showAll?"Show missed only":"Show all questions";fill()}},"Show all questions")),
+      review)
+  );
+  S=null; window.scrollTo(0,0);
+}
+
+document.addEventListener("keydown",e=>{
+  if(!S||S.confirm||e.metaKey||e.ctrlKey||e.altKey)return;
+  const k=e.key.toLowerCase(), idx="abcd".indexOf(k)>=0?"abcd".indexOf(k):"1234".indexOf(k);
+  if(idx>=0&&k.length===1){choose(S.items[S.i].ord[idx]);e.preventDefault();}
+  else if(e.key==="Enter"||e.key==="ArrowRight"){if(document.activeElement&&document.activeElement.tagName==="BUTTON"&&e.key==="Enter")return;if(S.i<S.items.length-1)go(1);}
+  else if(e.key==="ArrowLeft")go(-1);
+});
+if(!resume()) renderSetup();
+</script>
+</body>
+</html>
