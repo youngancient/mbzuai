@@ -39,7 +39,7 @@ p{margin:0}
 .between{justify-content:space-between}
 button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible,.opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap;align-self:flex-start;max-width:100%}
 .seg button{background:transparent;border:0;padding:8px 14px;font-weight:500;border-right:1px solid var(--line)}
 .seg button:last-child{border-right:0}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
@@ -344,8 +344,8 @@ function renderSetup(){
       ),
       el("div",{class:"field"},el("span",{class:"eyebrow",text:"Length"}),
         seg("len",[10,20,40,"all"],["10","20","40","All"])),
-      cfg.mode==="exam"?el("div",{class:"field"},el("span",{class:"eyebrow",text:"Time limit"}),
-        seg("timer",[0,30,45,60,90],["None","30 min","45 min","60 min","90 min"]),
+      cfg.mode==="exam"?el("div",{class:"field"},el("span",{class:"eyebrow",text:"Time limit (minutes)"}),
+        seg("timer",[0,30,45,60,90],["None","30","45","60","90"]),
         el("p",{class:"note",text:"Set it to match the time your test invitation gives you."})):null,
       missed.length?el("label",{class:"check"},
         Object.assign(el("input",{type:"checkbox",id:"missedOnly"}),{checked:cfg.missedOnly,onchange:e=>{cfg.missedOnly=e.target.checked;save();renderSetup()}}),
