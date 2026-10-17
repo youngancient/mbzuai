@@ -306,7 +306,6 @@ function renderSetup(){
   if(!missed.length) cfg.missedOnly=false;
   const p=pool(); const n=cfg.len==="all"?p.length:Math.min(cfg.len,p.length);
   const seg=(key,vals,labels)=>el("div",{class:"seg",role:"group"},vals.map((v,i)=>el("button",{"aria-pressed":String(cfg[key]===v),onclick:()=>{cfg[key]=v;save();renderSetup()}},labels[i])));
-  const fixedN=Q.filter(x=>x.f&&x.f!==DUP).length;
   const best=hist.length?Math.max(...hist.map(h=>Math.round(100*h.s/h.n))):null;
   const tstats=store.get("mbz-topics",{});
   const tried=Object.keys(TOPICS).filter(t=>tstats[t]&&tstats[t].n>0).sort((a,b)=>tstats[a].r/tstats[a].n-tstats[b].r/tstats[b].n||tstats[b].n-tstats[a].n);
@@ -325,8 +324,7 @@ function renderSetup(){
   app.replaceChildren(...[
     el("header",{class:"field"},
       el("span",{class:"eyebrow",text:"Master's admission test practice"}),
-      el("h1",{text:"MBZUAI Prep Quiz"}),
-      el("p",{class:"muted",text:`${Q.length} questions from your prep book · ${fixedN} answers corrected · options shuffled`})
+      el("h1",{text:"MBZUAI Prep Quiz"})
     ),
     hist.length?el("section",{class:"panel"},
       el("div",{class:"stats"},
